@@ -3,132 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cine 3D - Streaming, Chat y Butacas</title>
+    <title>Cine 3D - Experiencia Inmersiva</title>
     <style>
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #111; color: #fff;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0a0a0a; color: #fff; }
         #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-
-        /* Cruceta para apuntar a las butacas */
-        #crosshair {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 4px; height: 4px; background: rgba(255,255,255,0.8); border-radius: 50%;
-            z-index: 10; pointer-events: none; box-shadow: 0 0 4px rgba(0,0,0,1);
-        }
-
-        .ui-panel {
-            position: absolute; z-index: 200; background: rgba(25, 25, 25, 0.9);
-            backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px; padding: 15px; box-shadow: 0 4px 25px rgba(0,0,0,0.6);
-        }
+        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; background: rgba(255,255,255,0.9); border-radius: 50%; z-index: 10; pointer-events: none; box-shadow: 0 0 6px rgba(0,0,0,1); }
+        .ui-panel { position: absolute; z-index: 200; background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 215, 0, 0.3); border-radius: 12px; padding: 18px; box-shadow: 0 12px 40px rgba(0,0,0,0.9); }
         #controls-panel { top: 20px; left: 20px; width: 260px; }
         #multiplayer-panel { top: 20px; right: 20px; width: 310px; }
-        #media-panel {
-            bottom: 20px; left: 50%; transform: translateX(-50%); width: 600px;
-            display: flex; gap: 10px; align-items: center; justify-content: center;
-        }
-
-        /* --- CHAT CSS --- */
-        #chat-container {
-            bottom: 20px; left: 20px; width: 320px; height: 250px;
-            display: flex; flex-direction: column; padding: 10px;
-        }
-        #chat-messages {
-            flex-grow: 1; overflow-y: auto; margin-bottom: 10px;
-            font-size: 13px; color: #ddd; display: flex; flex-direction: column; gap: 4px;
-        }
-        .chat-msg { word-wrap: break-word; line-height: 1.4; }
-        .chat-sender { font-weight: bold; color: #00aaff; }
+        #media-panel { bottom: 20px; left: 50%; transform: translateX(-50%); width: 600px; display: flex; gap: 10px; align-items: center; justify-content: center; }
+        #chat-container { bottom: 20px; left: 20px; width: 320px; height: 250px; display: flex; flex-direction: column; padding: 12px; }
+        #chat-messages { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; font-size: 13px; color: #ddd; display: flex; flex-direction: column; gap: 5px; }
+        .chat-msg { word-wrap: break-word; line-height: 1.5; }
+        .chat-sender { font-weight: bold; color: #ffaa00; }
         .chat-me { font-weight: bold; color: #00ffaa; }
-
-        input, button {
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            color: #fff; padding: 10px 14px; border-radius: 6px; outline: none; font-size: 13px; transition: all 0.2s ease;
-        }
-        input:focus { border-color: #007acc; background: rgba(255,255,255,0.15); }
-        button { cursor: pointer; background: #007acc; font-weight: bold; border: none; }
-        button:hover { background: #0098ff; transform: translateY(-1px); }
-        button:active { transform: translateY(1px); }
-        .btn-stream { background: #e63946; }
-        .btn-stream:hover { background: #ff4d5a; }
-
-        #blocker {
-            position: absolute; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);
-            z-index: 100; display: flex; justify-content: center; align-items: center; text-align: center; cursor: pointer;
-        }
-        #instructions { font-size: 20px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; }
-        #sit-ui {
-            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 5px; z-index: 50;
-            font-weight: bold; color: #00ffaa; border: 1px solid #00ffaa; pointer-events: none;
-        }
+        input, button { background: rgba(255,255,255,0.1); border: 1px solid rgba(255, 215, 0, 0.2); color: #fff; padding: 10px 14px; border-radius: 8px; outline: none; font-size: 13px; transition: all 0.3s ease; }
+        input:focus { border-color: #ffaa00; background: rgba(255,255,255,0.2); box-shadow: 0 0 10px rgba(255,170,0,0.3); }
+        button { cursor: pointer; background: linear-gradient(135deg, #b8860b, #ffd700); font-weight: bold; border: none; color: #111; text-transform: uppercase; letter-spacing: 1px; }
+        button:hover { background: linear-gradient(135deg, #d4a017, #ffec8b); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.6); }
+        .btn-stream { background: linear-gradient(135deg, #8b0000, #e63946); color: white; }
+        .btn-stream:hover { background: linear-gradient(135deg, #a52a2a, #ff4d5a); }
+        #blocker { position: absolute; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); z-index: 100; display: flex; justify-content: center; align-items: center; text-align: center; cursor: pointer; }
+        #instructions { font-size: 22px; background: rgba(30, 20, 10, 0.95); padding: 40px; border-radius: 20px; border: 2px solid #ffd700; box-shadow: 0 0 60px rgba(255,215,0,0.4); }
+        #sit-ui { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); padding: 12px 24px; border-radius: 10px; z-index: 50; font-weight: bold; color: #ffd700; border: 2px solid #ffd700; pointer-events: none; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 5px #ffd700; } 50% { box-shadow: 0 0 25px #ffd700; } 100% { box-shadow: 0 0 5px #ffd700; } }
         .hidden { display: none !important; }
-        h3 { margin-top: 0; margin-bottom: 12px; font-size: 17px; border-bottom: 2px solid #007acc; padding-bottom: 6px; color: #fff; }
-        .peer-id-display {
-            font-family: monospace; background: #000; padding: 6px; border-radius: 4px;
-            user-select: all; margin-bottom: 10px; display: inline-block; color: #00ff00; font-size: 12px;
-        }
+        h3 { margin-top: 0; margin-bottom: 14px; font-size: 15px; border-bottom: 2px solid #ffd700; padding-bottom: 8px; color: #ffd700; text-transform: uppercase; letter-spacing: 2px; }
+        .peer-id-display { font-family: monospace; background: #000; padding: 8px; border-radius: 6px; user-select: all; margin-bottom: 10px; display: inline-block; color: #ffd700; font-size: 13px; border: 1px solid #444; box-shadow: inset 0 0 8px rgba(0,0,0,0.8); }
         .help-text { font-size: 12px; color: #aaa; margin-top: 5px; }
         #chat-messages::-webkit-scrollbar { width: 6px; }
-        #chat-messages::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+        #chat-messages::-webkit-scrollbar-thumb { background: #ffd700; border-radius: 3px; }
     </style>
-
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
-        }
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
     </script>
 </head>
 <body>
-
-    <div id="blocker">
-        <div id="instructions">
-            <h1 style="color: #007acc; margin-bottom: 10px; margin-top: 0;">Cine 3D</h1>
-            <p>Haz clic para entrar</p>
-            <p style="font-size: 14px; color: #aaa; margin-top: 15px;">WASD: Moverse | Clic Izquierdo en butaca: Sentarse<br>T: Chat | ESC: Menú</p>
-        </div>
-    </div>
-
-    <div id="sit-ui" class="hidden">Estás sentado. Pulsa ESPACIO para levantarte.</div>
+    <div id="blocker"><div id="instructions">
+        <h1 style="color: #ffd700; margin-bottom: 15px; font-size: 48px; text-shadow: 0 0 30px #b8860b;">🎬 Cine 3D</h1>
+        <p style="color: #eee; font-size: 18px;">Haz clic para entrar a la sala</p>
+        <p style="font-size: 14px; color: #aaa; margin-top: 25px;">
+            <span style="color:#ffd700;">WASD</span> Moverse &nbsp;|&nbsp;
+            <span style="color:#ffd700;">Click</span> Sentarse &nbsp;|&nbsp;
+            <span style="color:#ffd700;">ESPACIO</span> Levantarse &nbsp;|&nbsp;
+            <span style="color:#ffd700;">T</span> Chat
+        </p>
+    </div></div>
+    <div id="sit-ui" class="hidden">🍿 Estás sentado · ESPACIO para levantarte</div>
     <div id="crosshair"></div>
     <div id="canvas-container"></div>
-
     <div class="ui-panel" id="controls-panel">
-        <h3>Controles</h3>
-        <p style="font-size: 13px; margin: 0; line-height: 1.6;">
-            <b>W, A, S, D:</b> Moverse<br>
-            <b>Clic Izq:</b> Sentarse<br>
-            <b>ESPACIO:</b> Levantarse<br>
-            <b>T:</b> Abrir Chat<br>
-            <b>ESC:</b> Menú Principal
+        <h3>🎮 Controles</h3>
+        <p style="font-size:13px; margin:0; line-height:2; color:#ccc;">
+            <b style="color:#ffd700;">W A S D</b> - Moverse<br>
+            <b style="color:#ffd700;">Click Izq</b> - Sentarse<br>
+            <b style="color:#ffd700;">Espacio</b> - Levantarse<br>
+            <b style="color:#ffd700;">T</b> - Chat<br>
+            <b style="color:#ffd700;">ESC</b> - Soltar ratón
         </p>
     </div>
-
     <div class="ui-panel" id="multiplayer-panel">
-        <h3>Conexión P2P</h3>
-        <div>Tu ID de Sala:</div>
+        <h3>🌐 Conexión P2P</h3>
+        <div style="font-size:12px; color:#aaa; margin-bottom:4px;">Tu ID de Sala:</div>
         <div id="my-peer-id" class="peer-id-display">Generando...</div>
-        <div style="margin-top: 10px;">
-            <input type="text" id="join-peer-id" placeholder="ID del amigo" style="width: calc(100% - 30px); margin-bottom: 10px;">
-            <button id="btn-connect" style="width: 100%;">Conectar</button>
+        <div style="margin-top:10px;">
+            <input type="text" id="join-peer-id" placeholder="ID del amigo..." style="width:calc(100% - 30px); margin-bottom:10px;">
+            <button id="btn-connect" style="width:100%;">Conectar a sala</button>
         </div>
         <div id="connection-status" class="help-text">Estado: Desconectado</div>
     </div>
-
     <div class="ui-panel" id="media-panel">
-        <input type="file" id="video-file" accept="video/*" style="display: none;">
-        <button id="btn-trigger-file" class="btn-stream">Cargar Video y Transmitir a Todos</button>
-        <span id="stream-status" style="margin-left: 15px; font-size: 13px; color: #00ff00; display: none;">En vivo 🔴</span>
+        <input type="file" id="video-file" accept="video/*" style="display:none;">
+        <button id="btn-trigger-file" class="btn-stream">🎥 Cargar Video y Transmitir</button>
+        <span id="stream-status" style="margin-left:15px; font-size:13px; color:#ff4d5a; font-weight:bold; display:none;">EN VIVO 🔴</span>
     </div>
-
     <div class="ui-panel" id="chat-container">
-        <h3>Chat de Sala</h3>
+        <h3>💬 Chat</h3>
         <div id="chat-messages"></div>
         <input type="text" id="chat-input" placeholder="Pulsa T para escribir..." autocomplete="off">
     </div>
@@ -139,15 +90,13 @@
 
         let scene, camera, renderer, controls;
         let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let isChatting = false;
-        let isSeated = false;
-        
+        let isChatting = false, isSeated = false;
         const clock = new THREE.Clock();
         const velocity = new THREE.Vector3();
         const direction = new THREE.Vector3();
 
         let videoElement, videoTexture, screenMesh;
-        const seatHitboxes = []; // Aquí guardaremos las zonas donde el usuario puede hacer clic
+        const seatHitboxes = [];
         const raycaster = new THREE.Raycaster();
         const screenCenter = new THREE.Vector2(0, 0);
 
@@ -161,71 +110,51 @@
 
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x111111); 
-            scene.fog = new THREE.FogExp2(0x111111, 0.015);
-
+            scene.background = new THREE.Color(0x1a0f0a);
+            scene.fog = new THREE.FogExp2(0x1a0f0a, 0.012);
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 2, 12);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
+            camera.position.set(0, 2, 23);
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.outputColorSpace = THREE.SRGBColorSpace;
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); 
+            const ambientLight = new THREE.AmbientLight(0xffeedd, 0.45);
             scene.add(ambientLight);
-
-            const screenGlow = new THREE.PointLight(0x00aaff, 2.5, 35);
-            screenGlow.position.set(0, 5, -13); // Acercado a la pantalla
+            const screenGlow = new THREE.PointLight(0xddeeff, 3.0, 50);
+            screenGlow.position.set(0, 8, -10);
             scene.add(screenGlow);
-
-            const projectorLight = new THREE.SpotLight(0xffffff, 8);
-            projectorLight.position.set(0, 8, 14);
-            projectorLight.angle = Math.PI / 8;
-            projectorLight.penumbra = 0.5;
-            projectorLight.castShadow = true;
-            projectorLight.target.position.set(0, 5, -14);
-            scene.add(projectorLight);
-            scene.add(projectorLight.target);
+            const neonColor = 0xffaa33;
+            const hl1 = new THREE.PointLight(neonColor, 1.5, 14); hl1.position.set(-12, 3.5, 10); scene.add(hl1);
+            const hl2 = new THREE.PointLight(neonColor, 1.5, 14); hl2.position.set(12, 3.5, 10); scene.add(hl2);
+            const hl3 = new THREE.PointLight(neonColor, 1.2, 16); hl3.position.set(0, 3.5, 16); scene.add(hl3);
+            const hl4 = new THREE.PointLight(neonColor, 1.2, 16); hl4.position.set(0, 3.5, 21.5); scene.add(hl4);
+            const hl5 = new THREE.PointLight(0xffcc88, 0.9, 20); hl5.position.set(0, 3.5, 18.5); scene.add(hl5);
+            const hl6 = new THREE.PointLight(0xffcc88, 0.9, 20); hl6.position.set(0, 3.5, 24); scene.add(hl6);
 
             controls = new PointerLockControls(camera, renderer.domElement);
-
             const blocker = document.getElementById('blocker');
             blocker.addEventListener('click', (event) => {
-                if(event.target === blocker || event.target.id === 'instructions') {
-                    controls.lock();
-                }
+                if(event.target === blocker || event.target.id === 'instructions') controls.lock();
             });
-
             controls.addEventListener('lock', () => {
-                isChatting = false;
-                blocker.classList.add('hidden');
-                document.getElementById('chat-input').blur();
+                isChatting = false; blocker.classList.add('hidden'); document.getElementById('chat-input').blur();
             });
-
             controls.addEventListener('unlock', () => {
                 if (!isChatting) blocker.classList.remove('hidden');
             });
-
-            // Lógica de Raycaster para sentarse (Clic izquierdo en el canvas)
             renderer.domElement.addEventListener('mousedown', (event) => {
-                if (!controls.isLocked || isChatting) return;
-                if (event.button !== 0) return; // Solo clic izquierdo
-                
+                if (isChatting) { controls.lock(); return; }
+                if (!controls.isLocked) return;
+                if (event.button !== 0) return; 
                 raycaster.setFromCamera(screenCenter, camera);
                 const intersects = raycaster.intersectObjects(seatHitboxes);
-
-                if (intersects.length > 0 && !isSeated) {
-                    const hitbox = intersects[0].object;
-                    sitDown(hitbox);
-                }
+                if (intersects.length > 0 && !isSeated) sitDown(intersects[0].object);
             });
-
             const onKeyDown = (event) => {
                 const chatInput = document.getElementById('chat-input');
-                
                 if (document.activeElement === chatInput) {
                     if (event.code === 'Enter') {
                         const text = chatInput.value.trim();
@@ -234,23 +163,16 @@
                             broadcast({ type: 'chat', text: text, sender: peer.id });
                             chatInput.value = '';
                         }
+                        controls.lock(); 
                     }
                     return; 
                 }
-
                 if (event.code === 'KeyT' && controls.isLocked) {
-                    isChatting = true;
-                    controls.unlock();
-                    event.preventDefault(); 
+                    isChatting = true; controls.unlock(); event.preventDefault(); 
                     setTimeout(() => chatInput.focus(), 10);
                     return;
                 }
-
-                // Lógica para levantarse
-                if (event.code === 'Space' && isSeated) {
-                    standUp();
-                }
-
+                if (event.code === 'Space' && isSeated) standUp();
                 if (!isSeated) {
                     switch (event.code) {
                         case 'KeyW': moveForward = true; break;
@@ -260,7 +182,6 @@
                     }
                 }
             };
-
             const onKeyUp = (event) => {
                 if (document.activeElement === document.getElementById('chat-input')) return;
                 switch (event.code) {
@@ -270,281 +191,302 @@
                     case 'KeyD': moveRight = false; break;
                 }
             };
-
             document.addEventListener('keydown', onKeyDown);
             document.addEventListener('keyup', onKeyUp);
-
             buildCinema();
             setupVideo();
             setupPeerJS();
-
             window.addEventListener('resize', onWindowResize);
         }
 
         function sitDown(hitbox) {
             isSeated = true;
-            // Detener inercia
-            velocity.x = 0; velocity.z = 0; moveForward = false; moveBackward = false; moveLeft = false; moveRight = false;
-            // Posicionar la cámara en la butaca (altura de los ojos sentado)
-            camera.position.set(hitbox.position.x, hitbox.position.y + 0.4, hitbox.position.z);
+            velocity.set(0, 0, 0); moveForward = false; moveBackward = false; moveLeft = false; moveRight = false;
+            const platformY = hitbox.position.y - 0.7; 
+            camera.position.set(hitbox.position.x, platformY + 1.2, hitbox.position.z + 0.1);
             document.getElementById('sit-ui').classList.remove('hidden');
         }
 
         function standUp() {
             isSeated = false;
-            // Levantar la cámara y moverla un poco atrás para salir de la colisión de la silla
-            camera.position.y = 2;
-            camera.position.z += 1;
+            camera.position.z -= 0.5;
+            const groundY = getWalkableHeight(camera.position.x, camera.position.z);
+            if (groundY !== false) {
+                camera.position.y = groundY;
+            } else {
+                camera.position.y = 2.0;
+            }
             document.getElementById('sit-ui').classList.add('hidden');
         }
 
+        function createFloorCeilPair(geom, matF, matC, posX, posZ) {
+            const f = new THREE.Mesh(geom, matF); f.rotation.x = -Math.PI / 2; f.position.set(posX, -0.01, posZ); f.receiveShadow = true; scene.add(f);
+            const c = new THREE.Mesh(geom, matC); c.rotation.x = Math.PI / 2; c.position.set(posX, 14, posZ); scene.add(c);
+        }
+
         function buildCinema() {
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.9, metalness: 0.1 });
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x1f1f1f, roughness: 1.0 });
-            
-            // Suelo exacto de 30x30 centrado
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), floorMat);
-            floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0x3a1e1e, roughness: 0.8, metalness: 0.1 });
+            const wallMatDouble = new THREE.MeshStandardMaterial({ color: 0x3a1e1e, roughness: 0.8, metalness: 0.1, side: THREE.DoubleSide });
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x4a1010, roughness: 0.95, metalness: 0.0 });
+            const ceilMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.7, metalness: 0.3 });
 
-            // Techo cerrado
-            const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), wallMat);
-            ceiling.position.y = 12; ceiling.rotation.x = Math.PI / 2; scene.add(ceiling);
+            // Suelos y techos
+            createFloorCeilPair(new THREE.PlaneGeometry(32, 21.5), floorMat, ceilMat, 0, -4.25);
+            createFloorCeilPair(new THREE.PlaneGeometry(4, 7.5), floorMat, ceilMat, -12, 10.25);
+            createFloorCeilPair(new THREE.PlaneGeometry(4, 7.5), floorMat, ceilMat, 12, 10.25);
+            createFloorCeilPair(new THREE.PlaneGeometry(28, 4), floorMat, ceilMat, 0, 16);
+            createFloorCeilPair(new THREE.PlaneGeometry(4, 7), floorMat, ceilMat, 0, 21.5);
 
-            // Paredes alineadas a los bordes exactos del plano para borrar los espacios
-            const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(30, 12), wallMat);
-            frontWall.position.set(0, 6, -15); frontWall.receiveShadow = true; scene.add(frontWall);
+            // Paredes sala principal
+            const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(32, 14), wallMat); frontWall.position.set(0, 7, -15); scene.add(frontWall);
+            const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(21.5, 14), wallMat); leftWall.position.set(-16, 7, -4.25); leftWall.rotation.y = Math.PI / 2; scene.add(leftWall);
+            const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(21.5, 14), wallMat); rightWall.position.set(16, 7, -4.25); rightWall.rotation.y = -Math.PI / 2; scene.add(rightWall);
 
-            const backWall = new THREE.Mesh(new THREE.PlaneGeometry(30, 12), wallMat);
-            backWall.position.set(0, 6, 15); backWall.rotation.y = Math.PI; backWall.receiveShadow = true; scene.add(backWall);
+            // Pared trasera con aberturas
+            const bwCenter = new THREE.Mesh(new THREE.PlaneGeometry(20, 14), wallMatDouble); bwCenter.position.set(0, 7, 6.5); bwCenter.rotation.y = Math.PI; scene.add(bwCenter);
+            const bwLeft = new THREE.Mesh(new THREE.PlaneGeometry(2, 14), wallMatDouble); bwLeft.position.set(-15, 7, 6.5); bwLeft.rotation.y = Math.PI; scene.add(bwLeft);
+            const bwRight = new THREE.Mesh(new THREE.PlaneGeometry(2, 14), wallMatDouble); bwRight.position.set(15, 7, 6.5); bwRight.rotation.y = Math.PI; scene.add(bwRight);
 
-            const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(30, 12), wallMat);
-            leftWall.position.set(-15, 6, 0); leftWall.rotation.y = Math.PI / 2; leftWall.receiveShadow = true; scene.add(leftWall);
+            // Paredes pasillos laterales
+            const wallLLeft = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 14), wallMat); wallLLeft.rotation.y = Math.PI/2; wallLLeft.position.set(-14, 7, 10.25); scene.add(wallLLeft);
+            const wallLRight = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 14), wallMat); wallLRight.rotation.y = -Math.PI/2; wallLRight.position.set(-10, 7, 10.25); scene.add(wallLRight);
+            const wallRLeft = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 14), wallMat); wallRLeft.rotation.y = Math.PI/2; wallRLeft.position.set(10, 7, 10.25); scene.add(wallRLeft);
+            const wallRRight = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 14), wallMat); wallRRight.rotation.y = -Math.PI/2; wallRRight.position.set(14, 7, 10.25); scene.add(wallRRight);
 
-            const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(30, 12), wallMat);
-            rightWall.position.set(15, 6, 0); rightWall.rotation.y = -Math.PI / 2; rightWall.receiveShadow = true; scene.add(rightWall);
+            // Vestíbulo horizontal
+            const wallMInnerCenter = new THREE.Mesh(new THREE.PlaneGeometry(20, 14), wallMat); wallMInnerCenter.position.set(0, 7, 14); scene.add(wallMInnerCenter);
+            const wallMOuterL = new THREE.Mesh(new THREE.PlaneGeometry(12, 14), wallMat); wallMOuterL.rotation.y = Math.PI; wallMOuterL.position.set(-8, 7, 18); scene.add(wallMOuterL);
+            const wallMOuterR = new THREE.Mesh(new THREE.PlaneGeometry(12, 14), wallMat); wallMOuterR.rotation.y = Math.PI; wallMOuterR.position.set(8, 7, 18); scene.add(wallMOuterR);
+            const wallMEndL = new THREE.Mesh(new THREE.PlaneGeometry(4, 14), wallMat); wallMEndL.rotation.y = Math.PI/2; wallMEndL.position.set(-14, 7, 16); scene.add(wallMEndL);
+            const wallMEndR = new THREE.Mesh(new THREE.PlaneGeometry(4, 14), wallMat); wallMEndR.rotation.y = -Math.PI/2; wallMEndR.position.set(14, 7, 16); scene.add(wallMEndR);
+
+            // Pasillo de entrada
+            const wallCLeft = new THREE.Mesh(new THREE.PlaneGeometry(7, 14), wallMat); wallCLeft.rotation.y = Math.PI/2; wallCLeft.position.set(-2, 7, 21.5); scene.add(wallCLeft);
+            const wallCRight = new THREE.Mesh(new THREE.PlaneGeometry(7, 14), wallMat); wallCRight.rotation.y = -Math.PI/2; wallCRight.position.set(2, 7, 21.5); scene.add(wallCRight);
+            const wallCEnd = new THREE.Mesh(new THREE.PlaneGeometry(4, 14), wallMat); wallCEnd.rotation.y = Math.PI; wallCEnd.position.set(0, 7, 25); scene.add(wallCEnd);
+
+            // Neon
+            function addNeonStrip(x, z, length, color = 0xffaa33) {
+                const stripGeo = new THREE.CylinderGeometry(0.08, 0.08, length, 8);
+                const stripMat = new THREE.MeshStandardMaterial({ color: color, emissive: color, emissiveIntensity: 2.5 });
+                const strip = new THREE.Mesh(stripGeo, stripMat); strip.rotation.z = Math.PI/2; strip.position.set(x, 13.8, z); scene.add(strip);
+            }
+            addNeonStrip(-14, 10.25, 7.5); addNeonStrip(14, 10.25, 7.5); addNeonStrip(0, 16, 28); addNeonStrip(0, 21.5, 4);
 
             // Pantalla
-            const frame = new THREE.Mesh(new THREE.BoxGeometry(19, 11, 0.2), new THREE.MeshStandardMaterial({ color: 0x0a0a0a }));
-            frame.position.set(0, 6.5, -14.9); scene.add(frame);
+            const frameMat = new THREE.MeshStandardMaterial({ color: 0xb8860b, roughness: 0.4, metalness: 0.8 });
+            const frame = new THREE.Mesh(new THREE.BoxGeometry(25.4, 14.9, 0.4), frameMat); frame.position.set(0, 7.5, -15.1); scene.add(frame);
+            screenMesh = new THREE.Mesh(new THREE.PlaneGeometry(24, 13.5), new THREE.MeshBasicMaterial({ color: 0x000000 })); screenMesh.position.set(0, 7.5, -14.75); scene.add(screenMesh);
 
-            screenMesh = new THREE.Mesh(new THREE.PlaneGeometry(18, 10), new THREE.MeshBasicMaterial({ color: 0x000000 }));
-            screenMesh.position.set(0, 6.5, -14.75); scene.add(screenMesh);
+            // Cortinas
+            const curtainMat = new THREE.MeshStandardMaterial({ color: 0x8b0000, roughness: 0.6, side: THREE.DoubleSide });
+            const curtainLeft = new THREE.Mesh(new THREE.PlaneGeometry(2, 14), curtainMat); curtainLeft.position.set(-14.9, 7, -5); curtainLeft.rotation.y = Math.PI/4; scene.add(curtainLeft);
+            const curtainRight = new THREE.Mesh(new THREE.PlaneGeometry(2, 14), curtainMat); curtainRight.position.set(14.9, 7, -5); curtainRight.rotation.y = -Math.PI/4; scene.add(curtainRight);
 
+            // Butacas
             const seatGroup = new THREE.Group();
-            const fabricMat = new THREE.MeshStandardMaterial({ color: 0x990000, roughness: 0.8 });
-            const plasticMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.6 });
-
-            const cushion = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.6), fabricMat);
-            cushion.position.set(0, 0.35, 0); cushion.castShadow = true; cushion.receiveShadow = true; seatGroup.add(cushion);
-
-            // CORRECCIÓN: El respaldo ahora está en Z positivo (z = 0.35), por lo tanto la silla "mira" hacia Z negativo (hacia la pantalla)
-            const backrest = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.8, 0.15), fabricMat);
-            backrest.position.set(0, 0.8, 0.35); backrest.rotation.x = 0.15; 
-            backrest.castShadow = true; backrest.receiveShadow = true; seatGroup.add(backrest);
-
+            const fabricMat = new THREE.MeshStandardMaterial({ color: 0xcc3333, roughness: 0.7 });
+            const plasticMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.4 });
+            const cushion = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.6), fabricMat); cushion.position.set(0, 0.35, 0); seatGroup.add(cushion);
+            const backrest = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.8, 0.15), fabricMat); backrest.position.set(0, 0.8, 0.35); backrest.rotation.x = 0.15; seatGroup.add(backrest);
             const armGeo = new THREE.BoxGeometry(0.1, 0.2, 0.6);
-            const leftArm = new THREE.Mesh(armGeo, plasticMat);
-            leftArm.position.set(-0.4, 0.55, 0); leftArm.castShadow = true; seatGroup.add(leftArm);
-            
-            const rightArm = new THREE.Mesh(armGeo, plasticMat);
-            rightArm.position.set(0.4, 0.55, 0); rightArm.castShadow = true; seatGroup.add(rightArm);
+            const leftArm = new THREE.Mesh(armGeo, plasticMat); leftArm.position.set(-0.4, 0.55, 0); seatGroup.add(leftArm);
+            const rightArm = new THREE.Mesh(armGeo, plasticMat); rightArm.position.set(0.4, 0.55, 0); seatGroup.add(rightArm);
+            const base = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.3), plasticMat); base.position.set(0, 0.15, 0); seatGroup.add(base);
+            const hitboxGeo = new THREE.BoxGeometry(1.0, 1.2, 1.0); const hitboxMat = new THREE.MeshBasicMaterial({ visible: false });
+            const platMat = new THREE.MeshStandardMaterial({ color: 0x331111, roughness: 0.8 }); 
+            const stairMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.7 }); 
+            const xPositions = [-8, -6.6, -5.2, -1.8, -0.4, 1.0, 2.4, 5.8, 7.2, 8.6];
 
-            const base = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.3), plasticMat);
-            base.position.set(0, 0.15, 0); base.castShadow = true; seatGroup.add(base);
-            
-            // Geometría invisible para el Raycaster (Hitbox de la silla)
-            const hitboxGeo = new THREE.BoxGeometry(1.0, 1.5, 1.0);
-            const hitboxMat = new THREE.MeshBasicMaterial({ visible: false });
-
-            for (let r = 0; r < 6; r++) {
-                for (let c = 0; c < 9; c++) {
-                    const xPos = c * 1.4 - 5.6; 
-                    const zPos = r * 2.5 + 0.5; // Espaciado en Z
-
-                    // Instanciar Butaca visual
-                    const instancedSeat = seatGroup.clone();
-                    instancedSeat.position.set(xPos, 0, zPos);
-                    scene.add(instancedSeat);
-
-                    // Instanciar Hitbox invisible para clic
-                    const hitbox = new THREE.Mesh(hitboxGeo, hitboxMat);
-                    hitbox.position.set(xPos, 0.75, zPos);
-                    scene.add(hitbox);
-                    seatHitboxes.push(hitbox);
+            for (let r = 0; r < 4; r++) {
+                const zPos = -5 + (r * 2.5);
+                const yElev = r * 0.6;
+                const platDepth = 2.5;
+                const pLeft = new THREE.Mesh(new THREE.BoxGeometry(4.5, yElev + 0.1, platDepth), platMat); pLeft.position.set(-6.6, (yElev + 0.1)/2, zPos); pLeft.receiveShadow = true; scene.add(pLeft);
+                const pCenter = new THREE.Mesh(new THREE.BoxGeometry(6.0, yElev + 0.1, platDepth), platMat); pCenter.position.set(0.3, (yElev + 0.1)/2, zPos); pCenter.receiveShadow = true; scene.add(pCenter);
+                const pRight = new THREE.Mesh(new THREE.BoxGeometry(4.5, yElev + 0.1, platDepth), platMat); pRight.position.set(7.2, (yElev + 0.1)/2, zPos); pRight.receiveShadow = true; scene.add(pRight);
+                xPositions.forEach(xPos => {
+                    const instancedSeat = seatGroup.clone(); instancedSeat.position.set(xPos, yElev + 0.1, zPos); instancedSeat.castShadow = true; instancedSeat.receiveShadow = true; scene.add(instancedSeat);
+                    const hitbox = new THREE.Mesh(hitboxGeo, hitboxMat); hitbox.position.set(xPos, yElev + 0.7, zPos); scene.add(hitbox); seatHitboxes.push(hitbox);
+                });
+                const stepHeight = 0.6 / 3; const stepDepth = 2.5 / 3;
+                for (let s = 0; s < 3; s++) {
+                    const baseH = (r > 0) ? (r - 1) * 0.6 : 0; const sh = baseH + (s + 1) * stepHeight; const sz = zPos - 1.25 + s * stepDepth + (stepDepth/2);
+                    const s1 = new THREE.Mesh(new THREE.BoxGeometry(1.5, sh, stepDepth), stairMat); s1.position.set(-3.5, sh/2, sz); s1.receiveShadow = true; scene.add(s1);
+                    const s2 = new THREE.Mesh(new THREE.BoxGeometry(1.5, sh, stepDepth), stairMat); s2.position.set(4.1, sh/2, sz); s2.receiveShadow = true; scene.add(s2);
                 }
             }
         }
 
         function setupVideo() {
-            videoElement = document.createElement('video');
-            videoElement.crossOrigin = "anonymous";
-            videoElement.loop = false; videoElement.muted = false; videoElement.playsInline = true;
-
-            videoTexture = new THREE.VideoTexture(videoElement);
-            videoTexture.colorSpace = THREE.SRGBColorSpace;
+            videoElement = document.createElement('video'); videoElement.crossOrigin = "anonymous"; videoElement.loop = false; videoElement.muted = false; videoElement.playsInline = true;
+            videoTexture = new THREE.VideoTexture(videoElement); videoTexture.colorSpace = THREE.SRGBColorSpace;
             screenMesh.material = new THREE.MeshBasicMaterial({ map: videoTexture });
-
-            const fileInput = document.getElementById('video-file');
-            document.getElementById('btn-trigger-file').addEventListener('click', () => fileInput.click());
-            
-            fileInput.addEventListener('change', (event) => {
+            document.getElementById('btn-trigger-file').addEventListener('click', () => document.getElementById('video-file').click());
+            document.getElementById('video-file').addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file) {
-                    const fileURL = URL.createObjectURL(file);
-                    videoElement.src = fileURL;
+                    videoElement.src = URL.createObjectURL(file);
                     videoElement.play().then(() => {
                         if (videoElement.captureStream) activeStream = videoElement.captureStream(30);
                         else if (videoElement.mozCaptureStream) activeStream = videoElement.mozCaptureStream(30);
-
-                        if(activeStream && connections.length > 0) {
-                            connections.forEach(conn => peer.call(conn.peer, activeStream));
-                        }
+                        if(activeStream && connections.length > 0) connections.forEach(conn => peer.call(conn.peer, activeStream));
                         document.getElementById('stream-status').style.display = 'inline';
                     });
                 }
             });
         }
 
+        // NUEVA lógica de colisión basada en zonas transitables
+        function isWalkable(x, z) {
+            // Zonas con suelo (márgenes amplios)
+            const inMainRoom = (x >= -15.5 && x <= 15.5 && z >= -14.5 && z <= 6.5);
+            const inLeftCorridor = (x >= -14.2 && x <= -9.8 && z >= 6.2 && z <= 14.2);
+            const inRightCorridor = (x >= 9.8 && x <= 14.2 && z >= 6.2 && z <= 14.2);
+            const inUnion = (x >= -14.2 && x <= 14.2 && z >= 13.8 && z <= 18.2);
+            const inCentral = (x >= -2.2 && x <= 2.2 && z >= 17.8 && z <= 25.2);
+
+            if (!(inMainRoom || inLeftCorridor || inRightCorridor || inUnion || inCentral)) return false;
+
+            // Paredes internas
+            // Pared trasera (tres segmentos)
+            if (z >= 6.2 && z <= 6.8) {
+                if (x >= -10 && x <= 10) return false;       // centro
+                if (x >= -16 && x <= -14) return false;      // lado izq
+                if (x >= 14 && x <= 16) return false;        // lado der
+            }
+            // Hueco central sin suelo (entre z=6.8 y z=14.2, x de -10 a 10)
+            if (x >= -10 && x <= 10 && z >= 6.8 && z <= 14.2) return false;
+
+            // Pared del vestíbulo (z=14, centro)
+            if (x >= -10 && x <= 10 && z >= 13.8 && z <= 14.2) return false;
+
+            // Paredes traseras del vestíbulo (z=18)
+            if (z >= 17.8 && z <= 18.2) {
+                if (x >= -14.2 && x <= -2) return false;     // izquierda
+                if (x >= 2 && x <= 14.2) return false;       // derecha
+            }
+
+            // Paredes del pasillo de entrada
+            if ((x >= -2.2 && x <= -1.8) && z >= 17.8 && z <= 25.2) return false; // izq
+            if ((x >= 1.8 && x <= 2.2) && z >= 17.8 && z <= 25.2) return false;   // der
+            if (z >= 24.8 && z <= 25.2 && x >= -2.2 && x <= 2.2) return false;     // fondo
+
+            return true;
+        }
+
+        function getWalkableHeight(nx, nz) {
+            if (!isWalkable(nx, nz)) return false;
+
+            let height = 2.0;
+            // Ajuste de altura dentro de la sala (solo si está en zona de butacas)
+            if (nz <= 6.0 && nz >= -14.5 && nx >= -15.5 && nx <= 15.5) {
+                if (nz >= -6.25) { // a partir de la primera fila hacia atrás
+                    for (let r = 0; r < 4; r++) {
+                        const rowCenterZ = -5 + (r * 2.5);
+                        const rowMinZ = rowCenterZ - 1.25;
+                        const rowMaxZ = rowCenterZ + 1.25;
+                        if (nz >= rowMinZ && nz < rowMaxZ) {
+                            const inLeftBlock = (nx >= -9.0 && nx <= -2.5);
+                            const inCenterBlock = (nx >= -2.5 && nx <= 3.5);
+                            const inRightBlock = (nx >= 3.5 && nx <= 9.5);
+                            if (inLeftBlock || inCenterBlock || inRightBlock) {
+                                const onStair = (nx >= -4.25 && nx <= -2.75) || (nx >= 3.35 && nx <= 4.85);
+                                if (onStair) {
+                                    const progress = (nz - rowMinZ) / 2.5;
+                                    const baseH = (r > 0) ? (r - 1) * 0.6 : 0;
+                                    height = 2.0 + baseH + (progress * 0.6);
+                                } else {
+                                    height = 2.0 + (r * 0.6);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return height;
+        }
+
+        // P2P y avatares (sin cambios)
         function setupPeerJS() {
             peer = new Peer();
-            peer.on('open', (id) => {
-                document.getElementById('my-peer-id').innerText = id;
-                updateStatus("Esperando conexiones...");
-            });
-
+            peer.on('open', (id) => { document.getElementById('my-peer-id').innerText = id; updateStatus("Esperando..."); });
             peer.on('connection', registerConnection);
-
-            peer.on('call', (call) => {
-                updateStatus("Recibiendo transmisión de video...");
-                call.answer(); 
-                call.on('stream', (remoteStream) => {
-                    videoElement.src = ""; 
-                    videoElement.srcObject = remoteStream;
-                    videoElement.play().catch(e => console.error("Error stream:", e));
-                });
-            });
-
+            peer.on('call', (call) => { updateStatus("Recibiendo stream..."); call.answer(); call.on('stream', (remoteStream) => { videoElement.src = ""; videoElement.srcObject = remoteStream; videoElement.play().catch(e=>console.error(e)); }); });
             document.getElementById('btn-connect').addEventListener('click', () => {
-                const targetId = document.getElementById('join-peer-id').value.trim();
-                if (targetId && targetId !== peer.id) {
-                    updateStatus("Conectando...");
-                    registerConnection(peer.connect(targetId));
-                }
+                const tid = document.getElementById('join-peer-id').value.trim();
+                if (tid && tid !== peer.id) { updateStatus("Conectando..."); registerConnection(peer.connect(tid)); }
             });
         }
-
         function registerConnection(conn) {
-            conn.on('open', () => {
-                if (!connections.find(c => c.peer === conn.peer)) connections.push(conn);
-                updateStatus("Conectado con " + connections.length + " usuario(s)");
-                if(activeStream) peer.call(conn.peer, activeStream);
-            });
-
-            conn.on('data', (data) => {
-                if (data.type === 'move') {
-                    updatePlayerPosition(conn.peer, data.position, data.rotation);
-                } else if (data.type === 'chat') {
-                    appendChatMessage(data.sender, data.text);
-                }
-            });
-
-            conn.on('close', () => {
-                removePlayer(conn.peer);
-                connections = connections.filter(c => c.peer !== conn.peer);
-                updateStatus("Usuario desconectado. Total: " + connections.length);
-            });
+            conn.on('open', () => { if (!connections.find(c => c.peer === conn.peer)) connections.push(conn); updateStatus("Conectado (" + connections.length + ")"); if(activeStream) peer.call(conn.peer, activeStream); });
+            conn.on('data', (data) => { if (data.type === 'move') updatePlayerPosition(conn.peer, data.position, data.rotationY, data.rotationX); else if (data.type === 'chat') appendChatMessage(data.sender, data.text); });
+            conn.on('close', () => { removePlayer(conn.peer); connections = connections.filter(c => c.peer !== conn.peer); updateStatus("Desconectado. (" + connections.length + ")"); });
         }
-
-        function broadcast(data) {
-            connections.forEach(conn => { if (conn.open) conn.send(data); });
-        }
-
-        function updateStatus(text) {
-            document.getElementById('connection-status').innerText = "Estado: " + text;
-        }
-
-        function appendChatMessage(sender, text) {
-            const container = document.getElementById('chat-messages');
-            const isMe = sender === peer.id;
-            const name = isMe ? 'Tú' : sender.substring(0, 4);
-            const colorClass = isMe ? 'chat-me' : 'chat-sender';
-            
-            const div = document.createElement('div'); div.className = 'chat-msg';
-            div.innerHTML = `<span class="${colorClass}">${name}:</span> ${text}`;
-            container.appendChild(div); container.scrollTop = container.scrollHeight;
-        }
-
+        function broadcast(data) { connections.forEach(conn => { if (conn.open) conn.send(data); }); }
+        function updateStatus(text) { document.getElementById('connection-status').innerText = "Estado: " + text; }
+        function appendChatMessage(sender, text) { const c = document.getElementById('chat-messages'); const isMe = sender === peer.id; const div = document.createElement('div'); div.className = 'chat-msg'; div.innerHTML = `<span class="${isMe?'chat-me':'chat-sender'}">${isMe?'Tú':sender.substring(0,4)}:</span> ${text}`; c.appendChild(div); c.scrollTop = c.scrollHeight; }
         function createAvatar(id) {
             const avatarGroup = new THREE.Group();
             const bodyMat = new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff, roughness: 0.5 });
-            
-            const bodyMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.25, 1, 4, 16), bodyMat);
-            bodyMesh.position.y = 0.75; avatarGroup.add(bodyMesh);
-
-            const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 16), bodyMat);
-            headMesh.position.y = 1.6; avatarGroup.add(headMesh);
-
-            const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-            const leftEye = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.1, 0.05), eyeMat);
-            leftEye.position.set(-0.1, 1.65, 0.22);
-            const rightEye = leftEye.clone(); rightEye.position.x = 0.1;
-            avatarGroup.add(leftEye); avatarGroup.add(rightEye);
-
-            scene.add(avatarGroup); otherPlayers[id] = avatarGroup;
+            const bodyMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.3, 0.8, 4, 16), bodyMat); bodyMesh.position.y = 0.7; avatarGroup.add(bodyMesh);
+            const headGroup = new THREE.Group(); headGroup.position.y = 1.45;
+            const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 16), bodyMat); headGroup.add(headMesh);
+            const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff }); const pupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            const eyeGeo = new THREE.SphereGeometry(0.06, 8, 8); const pupGeo = new THREE.SphereGeometry(0.03, 8, 8);
+            const leftEye = new THREE.Mesh(eyeGeo, eyeMat); leftEye.position.set(-0.1, 0.05, -0.22);
+            const rightEye = new THREE.Mesh(eyeGeo, eyeMat); rightEye.position.set(0.1, 0.05, -0.22);
+            const lPup = new THREE.Mesh(pupGeo, pupilMat); lPup.position.set(0, 0, -0.05); leftEye.add(lPup);
+            const rPup = new THREE.Mesh(pupGeo, pupilMat); rPup.position.set(0, 0, -0.05); rightEye.add(rPup);
+            headGroup.add(leftEye); headGroup.add(rightEye); avatarGroup.add(headGroup);
+            avatarGroup.userData.head = headGroup; scene.add(avatarGroup); otherPlayers[id] = avatarGroup;
         }
-
-        function updatePlayerPosition(id, position, rotation) {
+        function updatePlayerPosition(id, position, rotationY, rotationX) {
             if (!otherPlayers[id]) createAvatar(id);
-            const avatar = otherPlayers[id];
-            avatar.position.set(position.x, position.y, position.z);
-            avatar.rotation.y = rotation;
+            const avatar = otherPlayers[id]; avatar.position.set(position.x, position.y, position.z);
+            avatar.rotation.y = rotationY; avatar.userData.head.rotation.x = rotationX;
         }
-
-        function removePlayer(id) {
-            if (otherPlayers[id]) { scene.remove(otherPlayers[id]); delete otherPlayers[id]; }
-        }
+        function removePlayer(id) { if (otherPlayers[id]) { scene.remove(otherPlayers[id]); delete otherPlayers[id]; } }
 
         function animate() {
             requestAnimationFrame(animate);
-
-            if (controls.isLocked === true && !isSeated) {
-                const delta = clock.getDelta();
-                velocity.x -= velocity.x * 10.0 * delta;
-                velocity.z -= velocity.z * 10.0 * delta;
-
+            const delta = Math.min(clock.getDelta(), 0.1);
+            if (controls.isLocked && !isSeated) {
                 direction.z = Number(moveForward) - Number(moveBackward);
                 direction.x = Number(moveRight) - Number(moveLeft);
-                direction.normalize(); 
-
-                if (moveForward || moveBackward) velocity.z -= direction.z * 120.0 * delta;
-                if (moveLeft || moveRight) velocity.x -= direction.x * 120.0 * delta;
-
-                controls.moveRight(-velocity.x * delta);
-                controls.moveForward(-velocity.z * delta);
-
-                // Altura al caminar
-                camera.position.y = 2; 
-                // Límites de la caja (colisiones rudimentarias contra las paredes)
-                camera.position.x = Math.max(-14.5, Math.min(14.5, camera.position.x));
-                camera.position.z = Math.max(-14.5, Math.min(14.5, camera.position.z));
-            } else if (isSeated) {
-                // Pequeño update para resetear el reloj y que la inercia no explote al levantarte
-                clock.getDelta(); 
+                direction.normalize();
+                const speed = 50.0;
+                velocity.z += direction.z * speed * delta;
+                velocity.x += direction.x * speed * delta;
+                const friction = 10.0;
+                velocity.z -= velocity.z * friction * delta;
+                velocity.x -= velocity.x * friction * delta;
+                const oldX = camera.position.x;
+                const oldZ = camera.position.z;
+                controls.moveRight(velocity.x * delta);
+                controls.moveForward(velocity.z * delta);
+                const nextX = camera.position.x;
+                const nextZ = camera.position.z;
+                const targetY = getWalkableHeight(nextX, nextZ);
+                if (targetY === false) {
+                    camera.position.x = oldX; camera.position.z = oldZ;
+                    velocity.x = 0; velocity.z = 0;
+                } else {
+                    if (Math.abs(targetY - camera.position.y) > 0.65) {
+                        camera.position.x = oldX; camera.position.z = oldZ;
+                        velocity.x = 0; velocity.z = 0;
+                    } else {
+                        camera.position.y += (targetY - camera.position.y) * 10.0 * delta;
+                    }
+                }
             }
-
-            // Enviar posición en red (Si estás sentado, se envía tu cámara más baja, tu avatar se verá sentado)
             if (controls.isLocked && connections.length > 0) {
-                broadcast({ type: 'move', position: { x: camera.position.x, y: camera.position.y - 1.5, z: camera.position.z }, rotation: camera.rotation.y });
+                broadcast({ type: 'move', position: { x: camera.position.x, y: camera.position.y - 1.5, z: camera.position.z }, rotationY: camera.rotation.y, rotationX: camera.rotation.x });
             }
-
             renderer.render(scene, camera);
         }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+        function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
     </script>
 </body>
 </html>
